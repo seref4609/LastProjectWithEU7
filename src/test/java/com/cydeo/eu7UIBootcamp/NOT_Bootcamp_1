@@ -1,0 +1,211 @@
+
+1. HTML:
+	Fundemantal Info as a Tester
+	Hyper Text Markup Language
+	UI part of the apps: HTML-CSS(style)-Javascript(action)
+
+	- WebElement ?
+		<button type="submit" class="btn btn-primary login__submit">Login</button>
+
+		- paired tag- tag name -> button (also we have unpaired)
+
+		- getText()
+
+	There is a need for Automation: there might be repeating steps in our test cases
+		- reduce time
+		- reduce human mistakes
+		- save some money
+
+*** Selenium (version 3)
+
+	For automation of the web pages we need two dependencies:
+	 <!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java -->
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>3.141.59</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/io.github.bonigarcia/webdrivermanager -->
+        <dependency>
+            <groupId>io.github.bonigarcia</groupId>
+            <artifactId>webdrivermanager</artifactId>
+            <version>5.1.0</version>
+        </dependency>
+
+    If you can manage driver versions manually maybe you don't need BoniGarcia. However this dependency makes the webdriver managing easy for us.
+
+//1. setup browser driver
+        WebDriverManager.chromedriver().setup();
+//2. create your driver object: opens an empty browser
+        WebDriver driver = new ChromeDriver();
+        // maximize the window
+        driver.manage().window().maximize();
+
+//3. navigate to the webPage we want
+        driver.get("https://web-table-2.cydeo.com/login");
+  // get the title of the page
+        String expectedTitle = "Cydeo Web Table App";
+        String actualTitle = driver.getTitle();
+
+We were doing navigations and tests, however we could not control the FLOW of our test cases or couldn't generate reports with Clasical Main Method
+
+****TESTNG unit testing**********
+@Test -- executable test methods
+@Before and @After for methods, tests, class
+
+For Assertions: Equal, True-boolean condition
+
+WebDriverFactory Utility Class (Primitive version of our advanced Singleton Driver Class)
+
+How do we locate a single webelement?
+	Which method we used?
+	findElement(): taking as parameter---locator
+
+HOW Many Locators?
+
+	LOCATORS that ARE NOT CUSTOM
+	- ID, check if it is dynamic
+	- name, check if it is duplicate or not(if it is duplicate we can not use it for a single webelement)
+	*** Duplicate locators are good candidate for List of WebElements findElements() method
+	- class name, could be duplicate
+	- tag Name
+	- Link Text and Partial Link Text
+	<a href="#" id="itemc" onclick="byCat('phone')" class="list-group-item">Phones</a>
+
+	CUSTOM LOCATORS
+	Xpath
+		- absolute xpath (not recommended: why? if a new element comes in between, it will not work)
+		/html/body/div/div/div/div/form/div[1]/input
+		- relative xpath
+		//tagName[@attribute='value']
+		//tagName[.='text']
+		less specific: //*[.='text']
+	CSS
+		tagName[attribute='value'] --- a[id='itemc']: a#itemc --> #itemc
+
+WHY do we locate elements?
+		- TO DO Ssome actions:
+				click()
+				sendKeys()
+				getText()
+				getAttribute()
+
+PIQs:
+	1. How do you handle dynamic locators?
+		- use custom locators: starts-with, ends-with or contains methods
+	2. What are differences between xpath and css?
+	- css, child to parent NO
+	- css can not be used with text
+	- no indexing if they are not under same parent (CSS)
+
+	3. exception that we get the most? No Such Element
+	- locators wrong
+	- webElement changed
+	- synchronization issue : Implicitly and Explicitly waits
+	4. What are the differences between Implicitly and Explicitly waits?
+		-Imp:applies globally to all steps
+		-Exp: applies specific element with specific condition
+
+		-Imp: waits until HTML is loaded and works with findElement method - No Such Element exception
+		-Exp: with different conditions - TimeOutException
+
+*RadioButtons: only one option can be selected
+*CheckBoxes: type of input element, more than one option can be selected
+		To select we use - click()
+		to verify if it is selected- > isSelected() method
+
+* Dropdowns:
+	- No select: What happens if I try to use Select class methods: UnexpectedTagNameException
+		locate like a regular HTML webelement and click/hover over
+	- Select Dropdowns: has select tag, we can use Selenium Select class methods
+
+How do we hover over?
+	** Actions class	(Advanced mouse and Keyboard actions)
+	Actions actions = new Actions(driver);
+	- double click
+	- scroll down
+	- drag and drop  + perform();
+
+How do you handle pop-ups?
+		1. HTML pop up: locate element and click
+		2. Javascript pop up? you can not inspect
+		Alert alert = driver.switchTo().alert;
+		alert.accept; dismiss, getText() or sendKeys
+
+Multiple Windows?
+	driver.getWindowHandles()--> driver.swithTo().window(andle);
+
+Another popular reason for getting No Such Elemnt exception?
+		check if you have another frame
+	What are frames? HTML inside another HTML
+
+*** NOTE: you can not switch between siblings directly***
+
+TestBase concept in TestNG: was not a utility class
+			- parent of your Test Cases
+
+We used 2 design concepts in our framework:
+
+	1. POM: Page Object Model
+		- create a java class for each page of my application
+		- webelements and methods over there
+		- that constructor in BasePage means all that WebElements belong to that diver object which is running
+	2. Singleton Design Concept
+
+		Allows us to use same driver object throughout our test case, because we are connecting different classes/codes together
+		And if you loose connection of driver object, your test case will fail.
+CUCUMBER Framework
+	BDD approach
+		- Agile Story
+		as a student, i want to login school webpage so i can watch lesson
+		As a user,I should be able to use the calculator, so that I can do arithmetic operations.
+		- Scenarios (Gherkin language)
+
+Scenario: Addition
+
+    Given the calculator app is open - **precondition**
+
+    When I add 2 and 2 - **action**
+
+    And -more actions
+
+    Then calculator should display result 4 - **verification expected result**
+
+    Cucumber Framework has two layers:
+    	First one: Business Layer - feature files/scenarios
+    	Second One: Technical layer - JAVA codes
+
+    How do we connect this two layers?
+    * CukesRunner class: we define Cucumber Options
+    			- glue (Java codes path) + features (scenarios path)
+
+    DryRun: true(get snippets) /false(actually running)
+
+    Tags: to select which scenarios you want to run
+
+    Hooks: methods that will execute before or after tests
+
+    Parameters: we passed ID and Spartan Name
+    inputs for our Test Cases
+
+    Difference Between BackGround and Hooks
+    Background is only good for specific Feature file
+    Hooks is used for the whole project
+
+    Some Interview Questions:
+   * Can you explain your locator strategy?
+    	- ID first
+    	- xpath then css
+   * Difference between Xpath and Css?
+   * How do you handle pop ups when you run tests?
+   * Difference between Implicit and Explicit waits?
+
+   * What is JavaScript Executor used for?
+   	- What is it? interface in Selenium Library
+   	It helps us to inject Javascript into our JAVA and Selenium
+
+   	- Scroll up and down
+   	- force click
+   	- open empty tabs
+   	- can enter test using javascript
+

@@ -1,3 +1,4 @@
+
 Feature: Test Spartan API with complete CRUD operations
 
   Scenario: Read data from Spartan API

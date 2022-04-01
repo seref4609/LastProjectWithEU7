@@ -34,6 +34,7 @@ public class SpartanFlowSteps {
         Assert.assertEquals(200,mockSpartanJSON.statusCode());
     }
 
+
     @When("User uses Mock Data to create a Spartan")
     public void userUsesMockDataToCreateASpartan() {
 
